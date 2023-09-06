@@ -10,13 +10,21 @@ This write up will summarize some of the Azure cloud topics pertinent to OpenShi
 
 ## OpenShift IPI Approach Options on Azure
 
-1. Azure Marketplace Template for MAS
+1. Azure Marketplace Templates
 
-2. Azure Marketplace Template for CPD
+IBM has deployed Azure templates that install OpenShift via IPI, then Maximo Applicaition Suite and/ or Cloud Pak for Data. This option has limited flexibility, since if an option is not part of the template, it cannot be configured. For example, airgapped clusters are not supported.
 
-3. OpenShift Installer
+![Screenshot 2023-09-06 at 8 46 44 AM](https://github.com/kathleenhosang/az-ocp/assets/40863347/b2b38180-79d0-4340-b908-de2d27b052de)
 
-This is what this guide will cover
+
+<img width="1090" alt="Screenshot 2023-08-29 at 4 22 19 PM" src="https://github.com/kathleenhosang/az-ocp/assets/40863347/c47de8c6-8474-4936-80fc-714f547a0b76">
+
+2. OpenShift Installer
+
+The OpenShift installer is the openshift-install package used to deploy an OpenShift cluster via IPI. It will prompt for information about the platform (in this case Azure) and will use Azure specific deployment scripts. This is the approach this page focuses on. The UPI (user provioned infrastructure) approach has more flexibility if the IPI approach does not meet client requirements. The most common requirement that it does not meet would be related to security, since in principal, you are allowing the deployment scripts to control your cloud environment infrastructure. See the documentation here: https://docs.openshift.com/container-platform/4.10/installing/installing_azure/installing-azure-private.html
+
+![Screenshot 2023-09-06 at 5 54 16 PM](https://github.com/kathleenhosang/az-ocp/assets/40863347/ef92d86e-55d4-4574-9582-fc76819b3b2d)
+
 
 ## Resource Groups
 
