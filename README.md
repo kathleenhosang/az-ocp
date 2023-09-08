@@ -18,8 +18,6 @@ IBM has deployed Azure templates that install OpenShift via IPI, then Maximo App
 ![Screenshot 2023-09-06 at 8 46 44 AM](https://github.com/kathleenhosang/az-ocp/assets/40863347/b2b38180-79d0-4340-b908-de2d27b052de)
 
 
-<img width="1090" alt="Screenshot 2023-08-29 at 4 22 19 PM" src="https://github.com/kathleenhosang/az-ocp/assets/40863347/c47de8c6-8474-4936-80fc-714f547a0b76">
-
 2. OpenShift Installer
 
 The OpenShift installer uses the ```openshift-install``` package to deploy an OpenShift cluster via IPI. It will prompt for information about the platform (in this case Azure) and will use Azure specific deployment scripts. This is the approach this page focuses on. The UPI (User Provioned Infrastructure) approach has more flexibility if the IPI approach does not meet client requirements. The most common client concern with IPI is related to security, since in principal, you are allowing the deployment scripts to control the cloud environment infrastructure. See the documentation here: https://docs.openshift.com/container-platform/4.10/installing/installing_azure/installing-azure-private.html
@@ -44,25 +42,32 @@ When assigning permissions, most clients prefer to assign at the resource group 
 
 When deploying OpenShift, the IPI installer consumes an ```install-config.yaml``` with a list of parameters. One of the optional parameters is ```OutboundType```, which can have the value ```LoadBalancer``` or ```UserDefinedRouting```. If User Defined Routing is employed, the external load balancer will not be assigned a public IP, as seen in the below diagram.
 
+
 <img width="753" alt="Screenshot 2023-09-08 at 10 36 36 AM" src="https://github.com/kathleenhosang/az-ocp/assets/40863347/fe19c0a5-1e13-4285-8ef5-97571e044bcd">
+
 
 See more details on using User Defined Routing in an OpenShift cluster: https://docs.openshift.com/container-platform/4.10/installing/installing_azure/installing-azure-private.html#installation-azure-user-defined-routing_installing-azure-private
 
-The default parameter value is default routing. Azure has a set of default behaviors that it will follow. Read more here. For example, private virtual machines are assigned a pseudo IP address managed by Azure. This is how outbound connectivity is secured.
+The default parameter value is ```LoadBalancer``` (default routing). Azure has a set of default behaviors that it will follow. When default routing is employed, OpenShift will create a load balancer with a public IP for outbound connectivity only. This is the default mechanism the load balancer uses to connect itself/ its backend pool to the outside world.
+Read more here: https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-udr-overview#system-routes.
 
-User defined routing means that routing tables are being used to manually control every hop traffic takes. Azure will not employ default routes; the assumption and requirement is that the user needs to set up outbound connectivity.
+User defined routing means that routing tables are being used to manually control every hop traffic takes. Azure will not employ default routes; the assumption and requirement is that the user needs to set up outbound connectivity. If User Defined Routing is employed, the load balancer will not be assigned a public IP. The load balancer requires explicit outbound connectivity. Ways to establish explicit connectivity include: employing a firewall, NAT gateway, or public IP.
+Read more on explicit connectivity here: https://learn.microsoft.com/en-us/azure/virtual-network/ip-services/default-outbound-access.
 
-When default routing is employed, OpenShift will create a load balancer with a public IP for outbound connectivity only. This is the default mechanism the load balancer uses to connect itself/ its backend pool to the outside world.
-
-If User Defined Routing is employed, the load balancer will not be assigned a public IP. The load balancer requires explicit outbound connectivity. Read more on explicit connectivity here. Ways to establish explicit connectivity include: employing a firewall, NAT gateway, or public IP.
-
-This means, that when User Defined Routing is being used, the cluster network must use a NAT gateway or firewall for outbound connectivity. This is not an OpenShift requirement, this is an Azure load balancer requirement.
+In summary, when User Defined Routing is employed, the cluster network must use a NAT gateway or firewall for outbound connectivity. This is not an OpenShift requirement, this is an Azure load balancer requirement.
 
 ## Airgapped and IPI
 
 The IPI approach requires connectivity to Azure APIs, which require outbound internet connectivity. These APIs are only required during the time of installation, and are on the allowlist URLs in the OpenShift documentation:
 
-This means that the IPI approach on Azure does not support fully airgapped solutions. Azure APIs do use an internal Azure backbone, they require outbound connectivity.
+<img width="738" alt="Screenshot 2023-09-08 at 11 00 22 AM" src="https://github.com/kathleenhosang/az-ocp/assets/40863347/48a46ebc-028c-44f6-b49a-bf0ce0677a3c">
+
+See full allowlist here: https://docs.openshift.com/container-platform/4.10/installing/install_config/configuring-firewall.html#configuring-firewall
+
+This means that the IPI approach on Azure does not support fully airgapped solutions. Azure APIs do use an internal Azure backbone, they require outbound connectivity. The OpenShift cluster subnets require access to Azure APIs:
+
+<img width="750" alt="Screenshot 2023-09-08 at 10 59 04 AM" src="https://github.com/kathleenhosang/az-ocp/assets/40863347/844ddee7-de6d-4ae8-9a64-ede3921c72bb">
+
 
 ## Using Enterprise DNS
 
@@ -70,7 +75,7 @@ The IPI approach requires Azure DNS, specifically Azure Private DNS for private 
 
 Azure private DNS may use DNS forwarding to forward records to an enterprise DNS server. This is the recommended approach.
 
-It is possible to install using the Azure Private DNS, manually migrate all records to the enterprise DNS, then replace the load balancer IP to point to the enterprise DNS IP. This is not the recommended approach, but if a client would like to do this, they may do with their networking team taking lead. 
+It is possible to install using the Azure Private DNS, manually migrate all records to the enterprise DNS, then replace the load balancer IP to point to the enterprise DNS IP. This is not the recommended approach, but if a client would like to do this, they may do so with their networking team taking lead, with the understanding that this is not an approach IBM or Red Hat is able to support. 
 
 ## Azure Container Registry
 
