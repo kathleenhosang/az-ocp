@@ -105,17 +105,21 @@ When using Azure Cloud, ACR is a fantastic option for a private registry for its
 
 ## Azure Storage
 
-Azure Storage Accounts 
+Azure Storage Accounts are used to logically group together Azure storage resources, including block, file, container, disk, or any storage object. The IPI installer will create a storage account under the OpenShift resource group. It will be immediately used to host boot diagnostic logs, and the ignition files used for installation.
 
-Azure Block Storage is created by default when installing via IPI. Azure File Storage must be created manually. Please see this guide to do so: 
+If a client has Azure policies around Storage Accounts, it's possible they will block the storage account from being created, and thus this approach cannot be used. Most the policies can be changed as a post-install task, which may be acceptable to the client.
 
-If using Azure File or Block Storage for IBM applications, first test that the storage classes work using ```Step 6: test your environment```: https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/
+Some storage classes are created by default when installing via IPI, depending on account settings and OCP version. Please see this guide to create Azure File Storage Account for MAS: https://github.com/Azure/maximo#azure-files-csi-drivers 
 
-<img width="894" alt="Screenshot 2023-09-08 at 12 05 13 PM" src="https://github.com/kathleenhosang/az-ocp/assets/40863347/440f8bf4-f409-45a7-b1e8-490418638159">
+If using Azure storage classes for IBM applications, first test that the storage classes work using ```Step 6: Finally, test your environment```: https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/
 
-
-Be aware that Azure File and Block storage are not supported options for any Cloud Pak solution. Development found both, especially Azure File, to be underperforming. They found that using the storage classes can result in locked files, due to lagging start up times.
+Be aware that Azure File and Block storage are not supported options for any Cloud Pak solution. Development found both, especially Azure File, underperformant. They found that using the storage classes can result in locked files, due to lagging start up times.
 
 ## Azure Key Vault
 
-Azure Key Vault (AKV) is a solution used to store secrets, and is commonly used for certificate management. IBM cert-manager does not currently support AKV. Enhancement request is being tracked here: get link where we are tracking the enhancement request
+Azure Key Vault (AKV) is a solution used to store secrets, and is commonly used for certificate management. IBM cert-manager does not currently support AKV. Enhancement request is being tracked here: <get link where we are tracking the enhancement request>
+
+
+![image](https://github.com/kathleenhosang/az-ocp/assets/40863347/f5d9fe2c-7e29-43f9-b354-5d2bee33b3ab)
+Diagram from: https://github.ibm.com/CloudPakForDataSWATAssets/Sustainability-Starter/blob/main/docs/maximo/day-2-operations/cerrificate-management-externalkeystore.md
+
