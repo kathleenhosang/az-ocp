@@ -8,6 +8,7 @@ The IPI approach uses the openshift-install installation program. It is a wrappe
 
 This write up will summarize some of the Azure cloud topics pertinent to OpenShift, and containerized products like MAS and Cloud Pak for Data.
 
+
 ## OpenShift IPI Approach Options on Azure
 
 1. Azure Marketplace Templates
@@ -26,17 +27,26 @@ The OpenShift installer uses the ```openshift-install``` package to deploy an Op
 ![Screenshot 2023-09-06 at 5 54 16 PM](https://github.com/kathleenhosang/az-ocp/assets/40863347/ef92d86e-55d4-4574-9582-fc76819b3b2d)
 
 
+
 ## Resource Groups
 
+In Azure, resources are logically organzied into resource groups. Resource groups are simply ways to manage Azure resources as a group- applying the same policies, access control, and lifecycle management. See the below image and link for more information on the different scopes of how Azure resources are managed.
 
+![image](https://github.com/kathleenhosang/az-ocp/assets/40863347/a0209bb8-2e8b-43fd-b445-6005c88d48c4)
+
+https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/overview#understand-scope
+
+This is an important concept when deploying OpenShift on Azure via IPI. When the installer deploys OpenShift, it places all of the OpenShift infrastructure into a new resource group. No other resources should be placed in this resource group. If you are defining a new resource group in the ```install-config.yaml``` for the OpenShift infrastructure, it must be empty. The OpenShift program uses the resource group to manage OpenShift infrastructure. For example, when using the ```destroy cluster``` command, the installer will delete the defined OpenShift resource group.
+
+When assigning permissions, most clients prefer to assign at the resource group level, rather than subscription level for more control. This can apply to the service principal that is used to deploy OpenShift. It needs permissions to the OpenShift resource group (which would need to be created before the time of installation), and the resource group that ccontains the DNS service and target network.
 
 ## Default Routing vs. User Defined Routing
 
-When deploying OpenShift, the IPI installer consumes an install-config.yaml with a list of parameters. One of the optional parameters is OutboundRouting.
+When deploying OpenShift, the IPI installer consumes an ```install-config.yaml``` with a list of parameters. One of the optional parameters is ```OutboundType```, which can have the value ```LoadBalancer``` or ```UserDefinedRouting```. If User Defined Routing is employed, the external load balancer will not be assigned a public IP, as seen in the below diagram.
 
-Get screenshot of explanation from docs
+<img width="753" alt="Screenshot 2023-09-08 at 10 36 36 AM" src="https://github.com/kathleenhosang/az-ocp/assets/40863347/fe19c0a5-1e13-4285-8ef5-97571e044bcd">
 
-The two options are default routing, or user defined routing.
+See more details on using User Defined Routing in an OpenShift cluster: https://docs.openshift.com/container-platform/4.10/installing/installing_azure/installing-azure-private.html#installation-azure-user-defined-routing_installing-azure-private
 
 The default parameter value is default routing. Azure has a set of default behaviors that it will follow. Read more here. For example, private virtual machines are assigned a pseudo IP address managed by Azure. This is how outbound connectivity is secured.
 
