@@ -113,11 +113,11 @@ Some storage classes are created by default when installing via IPI, depending o
 
 If using Azure storage classes for IBM applications, first test that the storage classes work using ```Step 6: Finally, test your environment```: https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/
 
-Be aware that Azure File and Block storage are not supported options for any Cloud Pak solution. Development found both, especially Azure File, underperformant. They found that using the storage classes can result in locked files, due to lagging start up times.
+Be aware that Azure File and Block storage are not supported options for any Cloud Pak solution. Development found both, especially Azure File, underperformant. They found that using the storage classes can result in locked files, due to lagging start up times. See supported storage options for Cloud Pak for Data here: https://www.ibm.com/docs/en/cloud-paks/cp-data/4.7.x?topic=planning-storage-considerations
 
 ## Azure Key Vault
 
-Azure Key Vault (AKV) is a solution used to store secrets, and is commonly used for certificate management. IBM cert-manager does not currently support AKV. Enhancement request is being tracked here: <get link where we are tracking the enhancement request>
+Azure Key Vault (AKV) is a solution used to store secrets, and is commonly used for certificate management. IBM cert-manager does not currently support AKV. Enhancement request is being tracked here: <link where we are tracking the enhancement request>
 
 
 ![image](https://github.com/kathleenhosang/az-ocp/assets/40863347/f5d9fe2c-7e29-43f9-b354-5d2bee33b3ab)
