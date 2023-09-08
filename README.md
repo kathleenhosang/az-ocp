@@ -2,9 +2,9 @@
 
 ## Introduction
 
-The infrastructure provisioned installation (IPI) approach is appropriate for most client requirements, and simplifies the installation with automation. However, it is critical to understand exactly what it is doing so you can (1) help the client ensure the cluster infrastructure is in policy, and (2) explain the solution with confidence. 
+The Installer Provisioned Infrastructure (IPI) approach is appropriate for most client requirements, and simplifies OpenShift installations with automation. However, it is critical to understand exactly what the installer is provisioning so you can (1) help the client ensure the cluster infrastructure is in policy, and (2) explain the solution with confidence. 
 
-The IPI approach uses the openshift-install installation program. It is a wrapper for terraform, and the terraform scripts are not publicly available. The only way to verify installation details not documented is to open a support ticket, or deploy the OpenShift installer in a test environment.
+The IPI approach uses the openshift-install installation program. It is a wrapper for terraform, and the terraform scripts are not publicly available. The only way to verify installation details that are not documented is to open a support ticket, or deploy the OpenShift installer in a test environment.
 
 This write up will summarize some of the Azure cloud topics pertinent to OpenShift, and containerized products like MAS and Cloud Pak for Data.
 
@@ -12,7 +12,7 @@ This write up will summarize some of the Azure cloud topics pertinent to OpenShi
 
 1. Azure Marketplace Templates
 
-IBM has deployed Azure templates that install OpenShift via IPI, then Maximo Applicaition Suite and/ or Cloud Pak for Data. This option has limited flexibility, since if an option is not part of the template, it cannot be configured. For example, airgapped clusters are not supported.
+IBM has deployed Azure templates that install OpenShift via IPI, then Maximo Applicaition Suite and/ or Cloud Pak for Data. This option has limited flexibility, since if an option is not part of the template, it cannot be configured. For example, airgapped clusters are not supported at this time. This approach is best suited for POCs or test environments with straightfoward requirements.
 
 ![Screenshot 2023-09-06 at 8 46 44 AM](https://github.com/kathleenhosang/az-ocp/assets/40863347/b2b38180-79d0-4340-b908-de2d27b052de)
 
@@ -21,12 +21,14 @@ IBM has deployed Azure templates that install OpenShift via IPI, then Maximo App
 
 2. OpenShift Installer
 
-The OpenShift installer is the openshift-install package used to deploy an OpenShift cluster via IPI. It will prompt for information about the platform (in this case Azure) and will use Azure specific deployment scripts. This is the approach this page focuses on. The UPI (user provioned infrastructure) approach has more flexibility if the IPI approach does not meet client requirements. The most common requirement that it does not meet would be related to security, since in principal, you are allowing the deployment scripts to control your cloud environment infrastructure. See the documentation here: https://docs.openshift.com/container-platform/4.10/installing/installing_azure/installing-azure-private.html
+The OpenShift installer uses the ```openshift-install``` package to deploy an OpenShift cluster via IPI. It will prompt for information about the platform (in this case Azure) and will use Azure specific deployment scripts. This is the approach this page focuses on. The UPI (User Provioned Infrastructure) approach has more flexibility if the IPI approach does not meet client requirements. The most common client concern with IPI is related to security, since in principal, you are allowing the deployment scripts to control the cloud environment infrastructure. See the documentation here: https://docs.openshift.com/container-platform/4.10/installing/installing_azure/installing-azure-private.html
 
 ![Screenshot 2023-09-06 at 5 54 16 PM](https://github.com/kathleenhosang/az-ocp/assets/40863347/ef92d86e-55d4-4574-9582-fc76819b3b2d)
 
 
 ## Resource Groups
+
+
 
 ## Default Routing vs. User Defined Routing
 
