@@ -1,5 +1,8 @@
 # Installing OpenShift on Azure (IPI)
 
+<img width="996" alt="Screenshot 2023-09-08 at 11 14 58 AM" src="https://github.com/kathleenhosang/az-ocp/assets/40863347/8911562c-c65a-45db-a2ff-f77294375c42">
+Example Architecture
+
 ## Introduction
 
 The Installer Provisioned Infrastructure (IPI) approach is appropriate for most client requirements, and simplifies OpenShift installations with automation. However, it is critical to understand exactly what the installer is provisioning so you can (1) help the client ensure the cluster infrastructure is in policy, and (2) explain the solution with confidence. 
@@ -64,7 +67,7 @@ The IPI approach requires connectivity to Azure APIs, which require outbound int
 
 See full allowlist here: https://docs.openshift.com/container-platform/4.10/installing/install_config/configuring-firewall.html#configuring-firewall
 
-This means that the IPI approach on Azure does not support fully airgapped solutions. Azure APIs do use an internal Azure backbone, they require outbound connectivity. The OpenShift cluster subnets require access to Azure APIs:
+This means that the IPI approach on Azure does not support fully airgapped solutions. Azure APIs do use an internal Azure backbone, they require outbound connectivity. The OpenShift cluster subnets require access to Azure APIs, per the below diagram showing the OpenShift cluster at the time of installation:
 
 <img width="750" alt="Screenshot 2023-09-08 at 10 59 04 AM" src="https://github.com/kathleenhosang/az-ocp/assets/40863347/844ddee7-de6d-4ae8-9a64-ede3921c72bb">
 
@@ -73,28 +76,45 @@ This means that the IPI approach on Azure does not support fully airgapped solut
 
 The IPI approach requires Azure DNS, specifically Azure Private DNS for private cluster.
 
-Azure private DNS may use DNS forwarding to forward records to an enterprise DNS server. This is the recommended approach.
+The private VNET must be linked to a Private Azure DNS resource. For example:
 
-It is possible to install using the Azure Private DNS, manually migrate all records to the enterprise DNS, then replace the load balancer IP to point to the enterprise DNS IP. This is not the recommended approach, but if a client would like to do this, they may do so with their networking team taking lead, with the understanding that this is not an approach IBM or Red Hat is able to support. 
+<img width="950" alt="Screenshot 2023-09-08 at 11 23 18 AM" src="https://github.com/kathleenhosang/az-ocp/assets/40863347/77ebc3b2-961a-41bc-8824-035e78ec9d83">
+
+
+
+Azure private DNS may use DNS forwarding to forward records to an enterprise DNS server. This is the recommended approach. See documentation to set up DNS fowarding here: https://learn.microsoft.com/en-us/azure/dns/private-resolver-hybrid-dns
+
+However, it is possible to forgo DNS forwarding and use the Enterprise DNS directly, though this should not be recommended unless there is a legitimate reason why DNS forwarding cannot be used. It is possible to install using Azure Private DNS, manually migrate all records to the enterprise DNS, then at the VNET level, set the DNS IP to the enterprise DNS IP (rather than using link to Azure private DNS). This is not the recommended approach, but if a client would like to do this, they may do so with their networking team taking lead, with the understanding that this is an approach IBM, Red Hat, and likely Microsoft is unable to support since the client will be managing their own Enterprise DNS set up. 
+
+
+<img width="1263" alt="Screenshot 2023-09-08 at 11 32 23 AM" src="https://github.com/kathleenhosang/az-ocp/assets/40863347/7fcefe89-2d23-4fc6-9bb6-88680f664fc1">
+
+
 
 ## Azure Container Registry
 
 Azure Container Registry (ACR) is a docker 2v2 schema compliant registry that may be used to mirror Cloud Pak for Data or MAS images.
 
-It’s port is 8080 and is implicit; as of 2023, the port for ACR cannot be included in any oc mirror commands or it will fail.
+It’s port is 8080 and is implicit; in my experience, the port cannot be included in any ```oc mirror``` commands or it will fail.
 
-## Azure Storage Accounts
+For push and pull credentials, the admin user should be enabled, and its credentials should be used.
 
-## Azure File and Block Storage
+<img width="1033" alt="Screenshot 2023-09-08 at 11 46 13 AM" src="https://github.com/kathleenhosang/az-ocp/assets/40863347/52bc2bf2-1ded-4c08-817f-92e1ca97726d">
 
-Azure File and Block storage 
+When using Azure Cloud, ACR is a fantastic option for a private registry for its ease of use and management. See further documentation here: https://learn.microsoft.com/en-us/azure/container-registry/
 
-Azure Block Storage is created by default when installing via IPI. Validate if additional steps are required to use
+## Azure Storage
 
-Azure File Storage must be created manually. Please see this guide to do so:
-Add guide
+Azure Storage Accounts 
 
-Be aware that Azure File and Block storage are not supported options for any Cloud Pak solution. Development found both, especially Azure File, to not be performant. They found that using the storage classes can result in locked files, due to lagging start up times.
+Azure Block Storage is created by default when installing via IPI. Azure File Storage must be created manually. Please see this guide to do so: 
+
+If using Azure File or Block Storage for IBM applications, first test that the storage classes work using ```Step 6: test your environment```: https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/
+
+<img width="894" alt="Screenshot 2023-09-08 at 12 05 13 PM" src="https://github.com/kathleenhosang/az-ocp/assets/40863347/440f8bf4-f409-45a7-b1e8-490418638159">
+
+
+Be aware that Azure File and Block storage are not supported options for any Cloud Pak solution. Development found both, especially Azure File, to be underperforming. They found that using the storage classes can result in locked files, due to lagging start up times.
 
 ## Azure Key Vault
 
